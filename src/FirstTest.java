@@ -90,7 +90,7 @@ public class FirstTest {
                 "Cannot find list of search result", 15);
         for (WebElement element : searchElements) {
             Assert.assertTrue("The title " + element.getAttribute("text") + " doesn't contain 'Java'",
-                    element.getAttribute("text").contains("Java"));
+                    element.getAttribute("text").toLowerCase().contains("java"));
         }
     }
 
