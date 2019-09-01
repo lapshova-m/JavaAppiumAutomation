@@ -1,10 +1,12 @@
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -94,6 +96,150 @@ public class FirstTest {
         }
     }
 
+    @Test
+    public void saveFirstArticleToMyList() {
+        waitForElementAndClick(
+                By.xpath("//*[contains(@text, 'Search Wikipedia')]"),
+                "Cannot find 'Search Wikipedia' input",
+                5);
+
+        String searchString = "Java";
+        waitForElementAndSendKeys(
+                By.xpath("//*[contains(@text, 'Search…')]"),
+                searchString,
+                "Cannot find search input",
+                5
+        );
+
+        waitForElementAndClick(
+                By.xpath("//*[@resource-id='org.wikipedia:id/page_list_item_container']" +
+                        "//*[@text='Object-oriented programming language']"),
+                "Cannot find 'Object-oriented programming language' title",
+                5);
+
+        By titleLocator = By.id("org.wikipedia:id/view_page_title_text");
+
+        String titleOfFirstArticle = waitForElementAndGetAttribute(
+                titleLocator,
+                "text",
+                "Cannot find title of the first article", 15);
+
+//        Add the first article to the list
+        By moreOptionsLocator = By.xpath("//android.widget.ImageView[@content-desc='More options']");
+        waitForElementAndClick(
+                moreOptionsLocator,
+                "Cannot find button to open article options",
+                5);
+
+        By addToReadingListLocator = By.xpath("//*[@text='Add to reading list']");
+        waitForElementAndClick(
+                addToReadingListLocator,
+                "Cannot find option to add article to reading list",
+                5);
+
+        waitForElementAndClick(
+                By.id("org.wikipedia:id/onboarding_button"),
+                "Cannot find 'Got it' tip overlay",
+                5);
+
+        waitForElementAndClear(
+                By.id("org.wikipedia:id/text_input"),
+                "Cannot find input to set name of article folder",
+                5);
+
+        String nameOfFolder = "Learning programming";
+
+        waitForElementAndSendKeys(
+                By.id("org.wikipedia:id/text_input"),
+                nameOfFolder,
+                "Cannot put text into articles folder input",
+                5);
+
+        waitForElementAndClick(
+                By.xpath("//*[@text='OK']"),
+                "Cannot press OK button",
+                5);
+
+        waitForElementAndClick(
+                By.xpath("//android.widget.ImageButton[@content-desc='Navigate up']"),
+                "Cannot close article, cannot find X link",
+                5);
+
+//        Find the second article and add it to the list
+        waitForElementAndClick(
+                By.xpath("//*[contains(@text, 'Search Wikipedia')]"),
+                "Cannot find 'Search Wikipedia' input",
+                5);
+
+        waitForElementAndSendKeys(
+                By.xpath("//*[contains(@text, 'Search…')]"),
+                searchString,
+                "Cannot find search input",
+                5
+        );
+
+        waitForElementAndClick(
+                By.xpath("//*[@resource-id='org.wikipedia:id/page_list_item_container']" +
+                        "//*[contains(@text, 'Set of several computer')]"),
+                "Cannot find 'Object-oriented programming language' title",
+                5);
+
+        String titleOfSecondArticle = waitForElementAndGetAttribute(
+                titleLocator,
+                "text",
+                "Cannot find title of the second article",
+                15);
+
+        waitForElementAndClick(
+                moreOptionsLocator,
+                "Cannot find button to open article options",
+                5);
+
+        waitForElementAndClick(
+                addToReadingListLocator,
+                "Cannot find option to add article to reading list",
+                5);
+
+        waitForElementAndClick(
+                By.xpath("//*[@text = '" + nameOfFolder + "']"),
+                "Cannot find the folder " + nameOfFolder + " of articles",
+                15);
+
+        waitForElementAndClick(
+                By.xpath("//android.widget.ImageButton[@content-desc='Navigate up']"),
+                "Cannot close article, cannot find X link",
+                5);
+
+//        Open list of articles
+        waitForElementAndClick(
+                By.xpath("//android.widget.FrameLayout[@content-desc='My lists']"),
+                "Cannot find navigation button to My lists",
+                5);
+
+        waitForElementAndClick(
+                By.xpath("//*[@text='" + nameOfFolder + "']"),
+                "Cannot find created folder",
+                5);
+
+//        Delete the first article and check the second one
+        swipeElementToLeft(
+                By.xpath("//*[@text='" + titleOfFirstArticle + "']"),
+                "Cannot find saved the first article");
+
+        waitForElementAndClick(
+                By.xpath("//*[@text='" + titleOfSecondArticle + "']"),
+                "There isn't the second article after deleting on the first one",
+                5);
+
+        String titleOfTheLastArticle = waitForElementAndGetAttribute(
+                By.id("org.wikipedia:id/view_page_title_text"),
+                "text", "Cannot find title of article",
+                15);
+
+        Assert.assertEquals("Article title have been changes after opening from list",
+                titleOfSecondArticle, titleOfTheLastArticle);
+    }
+
     private WebElement waitForElementPresent(By by, String errorMessage, long timeoutInSeconds) {
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
         wait.withMessage(errorMessage + "\n");
@@ -126,5 +272,77 @@ public class FirstTest {
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
         wait.withMessage(errorMessage + "\n");
         return wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(by));
+    }
+
+    private WebElement waitForElementAndClear(By by, String errorMessage, long timeoutInSeconds) {
+        WebElement element = waitForElementPresent(by, errorMessage, timeoutInSeconds);
+        element.clear();
+        return element;
+    }
+
+    protected void swipeUp(int timeOfSwipe) {
+        TouchAction action = new TouchAction(driver);
+        Dimension size = driver.manage().window().getSize();
+        int x = size.width / 2;
+        int startY = (int)(size.height * 0.8);
+        int endY = (int)(size.height * 0.2);
+        action
+                .press(x, startY)
+                .waitAction(timeOfSwipe)
+                .moveTo(x, endY)
+                .release()
+                .perform();
+    }
+
+    protected void swipeUpQuick() {
+        swipeUp(200);
+    }
+
+    protected void swipeUpToFindElement(By by, String errorMessage, int maxSwipes) {
+        int alreadySwiped = 0;
+        while (driver.findElements(by).size() == 0) {
+            if (alreadySwiped > maxSwipes) {
+                waitForElementPresent(by, "Cannot find element by swiping up. \n" + errorMessage, 0);
+                return;
+            }
+            swipeUpQuick();
+            ++alreadySwiped;
+        }
+    }
+
+    protected void swipeElementToLeft(By by, String errorMessage) {
+        WebElement element = waitForElementPresent(by, errorMessage, 10);
+
+        int leftX = element.getLocation().getX();
+        int rightX = leftX + element.getSize().getWidth();
+        int upperY = element.getLocation().getY();
+        int lowerY = upperY + element.getSize().getHeight();
+        int middleY = (upperY + lowerY) / 2;
+
+        TouchAction action = new TouchAction(driver);
+        action
+                .press(rightX, middleY)
+                .waitAction(300)
+                .moveTo(leftX, middleY)
+                .release()
+                .perform();
+    }
+
+    private int getAmountOfElements(By by) {
+        List elements = driver.findElements(by);
+        return elements.size();
+    }
+
+    private  void assertElementNotPresent(By by, String errorMessage) {
+        int amountOfElements = getAmountOfElements(by);
+        if (amountOfElements > 0) {
+            String defaultMessage = "An element '" + by.toString() + "' suppoused to be not present";
+            throw new AssertionError(defaultMessage + " " + errorMessage);
+        }
+    }
+
+    private String waitForElementAndGetAttribute(By by, String attribute, String error_message, long timeoutInSeconds) {
+        WebElement element = waitForElementPresent(by, error_message, timeoutInSeconds);
+        return element.getAttribute(attribute);
     }
 }
