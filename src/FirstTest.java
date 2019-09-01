@@ -240,6 +240,31 @@ public class FirstTest {
                 titleOfSecondArticle, titleOfTheLastArticle);
     }
 
+    @Test
+    public void testTitleOfArticle() {
+        waitForElementAndClick(
+                By.xpath("//*[contains(@text, 'Search Wikipedia')]"),
+                "Cannot find 'Search Wikipedia' input",
+                5);
+
+        String searchString = "Java";
+        waitForElementAndSendKeys(
+                By.xpath("//*[contains(@text, 'Search…')]"),
+                searchString,
+                "Cannot find search input",
+                5
+        );
+
+        waitForElementAndClick(
+                By.xpath("//*[@resource-id='org.wikipedia:id/page_list_item_container']" +
+                        "//*[@text='Object-oriented programming language']"),
+                "Cannot find 'Object-oriented programming language' title",
+                5);
+
+        By titleLocator = By.id("org.wikipedia:id/view_page_title_text");
+        assertElementPresent(titleLocator, "We haven't found title in the page");
+    }
+
     private WebElement waitForElementPresent(By by, String errorMessage, long timeoutInSeconds) {
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
         wait.withMessage(errorMessage + "\n");
@@ -336,8 +361,16 @@ public class FirstTest {
     private  void assertElementNotPresent(By by, String errorMessage) {
         int amountOfElements = getAmountOfElements(by);
         if (amountOfElements > 0) {
-            String defaultMessage = "An element '" + by.toString() + "' suppoused to be not present";
-            throw new AssertionError(defaultMessage + " " + errorMessage);
+            String defaultMessage = "An element '" + by.toString() + "' supposed to be not present";
+            throw new AssertionError(defaultMessage + "\n" + errorMessage);
+        }
+    }
+
+    private void assertElementPresent(By by, String errorMessage) {
+        int amountOfElements = getAmountOfElements(by);
+        if (amountOfElements == 0) {
+            String defaultMessage = "An element '" + by.toString() + "' supposed to be present";
+            throw new AssertionError(defaultMessage + "\n" + errorMessage);
         }
     }
 
