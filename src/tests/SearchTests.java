@@ -2,7 +2,7 @@ package tests;
 
 import lib.CoreTestCase;
 import org.junit.Test;
-import ui.SearchPageObject;
+import lib.ui.SearchPageObject;
 
 public class SearchTests extends CoreTestCase {
 

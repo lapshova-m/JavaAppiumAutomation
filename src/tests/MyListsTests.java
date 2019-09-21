@@ -2,7 +2,7 @@ package tests;
 
 import lib.CoreTestCase;
 import org.junit.Test;
-import ui.*;
+import lib.ui.*;
 
 public class MyListsTests extends CoreTestCase {
 

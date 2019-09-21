@@ -2,8 +2,8 @@ package tests;
 
 import lib.CoreTestCase;
 import org.junit.Test;
-import ui.ArticlePageObject;
-import ui.SearchPageObject;
+import lib.ui.ArticlePageObject;
+import lib.ui.SearchPageObject;
 
 public class ChangeAppConditionTests extends CoreTestCase {
 
