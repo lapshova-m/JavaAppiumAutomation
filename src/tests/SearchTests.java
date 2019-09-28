@@ -1,6 +1,7 @@
 package tests;
 
 import lib.CoreTestCase;
+import lib.ui.factories.SearchPageObjectFactory;
 import org.junit.Test;
 import lib.ui.SearchPageObject;
 
@@ -8,7 +9,7 @@ public class SearchTests extends CoreTestCase {
 
     @Test
     public void testSearch() {
-        SearchPageObject searchPageObject = new SearchPageObject(driver);
+        SearchPageObject searchPageObject = SearchPageObjectFactory.get(driver);
 
         searchPageObject.initSearchInput();
         searchPageObject.typeSearchLine("Java");
@@ -17,7 +18,7 @@ public class SearchTests extends CoreTestCase {
 
     @Test
     public void testSearchForThreeResultArticles() {
-        SearchPageObject searchPageObject = new SearchPageObject(driver);
+        SearchPageObject searchPageObject = SearchPageObjectFactory.get(driver);
 
         searchPageObject.initSearchInput();
         searchPageObject.typeSearchLine("Java");
@@ -28,7 +29,7 @@ public class SearchTests extends CoreTestCase {
 
     @Test
     public void testCancelSearch() {
-        SearchPageObject searchPageObject = new SearchPageObject(driver);
+        SearchPageObject searchPageObject = SearchPageObjectFactory.get(driver);
 
         searchPageObject.initSearchInput();
         searchPageObject.waitForCancelButtonToAppear();
@@ -38,7 +39,7 @@ public class SearchTests extends CoreTestCase {
 
     @Test
     public void testWordsInSearchList() {
-        SearchPageObject searchPageObject = new SearchPageObject(driver);
+        SearchPageObject searchPageObject = SearchPageObjectFactory.get(driver);
 
         searchPageObject.initSearchInput();
         String searchString = "Java";
@@ -50,7 +51,7 @@ public class SearchTests extends CoreTestCase {
     public void testAmountOfNotEmptySearch() {
         String searchLine = "Linkin Park Discography";
 
-        SearchPageObject searchPageObject = new SearchPageObject(driver);
+        SearchPageObject searchPageObject = SearchPageObjectFactory.get(driver);
         searchPageObject.initSearchInput();
         searchPageObject.typeSearchLine(searchLine);
         int amountOfSearchResults = searchPageObject.getAmountOfFoundArticles();
@@ -62,7 +63,7 @@ public class SearchTests extends CoreTestCase {
     public void testAmountOfEmptySearch() {
         String searchLine = "nbvhvnbsvd";
 
-        SearchPageObject searchPageObject = new SearchPageObject(driver);
+        SearchPageObject searchPageObject = SearchPageObjectFactory.get(driver);
         searchPageObject.initSearchInput();
         searchPageObject.typeSearchLine(searchLine);
         searchPageObject.waitForEmptyResultsLabel();

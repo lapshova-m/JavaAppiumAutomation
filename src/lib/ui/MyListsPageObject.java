@@ -1,12 +1,14 @@
 package lib.ui;
 
 import io.appium.java_client.AppiumDriver;
+import lib.Platform;
 
-public class MyListsPageObject extends MainPageObject {
+abstract public class MyListsPageObject extends MainPageObject {
 
-    public static final String
-        FOLDER_BY_NAME_TPL = "xpath://*[@text='{FOLDER_NAME}']",
-        ARTICLE_BY_TITLE_TPL = "xpath://*[@text='{TITLE}']";
+    protected static String
+        FOLDER_BY_NAME_TPL,
+        ARTICLE_BY_TITLE_TPL,
+        ARTICLE_BY_DESCRIPTION_TPL;
 
     /* TEMPLATES METHODS */
     private static String getFolderXpathByName(String nameOfFolder) {
@@ -15,6 +17,10 @@ public class MyListsPageObject extends MainPageObject {
 
     private static String getSavedArticleXpathByTitle(String articleTitle) {
         return ARTICLE_BY_TITLE_TPL.replace("{TITLE}", articleTitle);
+    }
+
+    private static String getSavedArticleXpathByDescription(String articleDescription) {
+        return ARTICLE_BY_DESCRIPTION_TPL.replace("{DESCRIPTION}", articleDescription);
     }
     /* TEMPLATES METHODS */
 
@@ -28,26 +34,33 @@ public class MyListsPageObject extends MainPageObject {
     }
 
     public void waitForArticleToAppearByTitle(String articleTitle) {
-
-        this.waitForElementPresent(getFolderXpathByName(articleTitle),
+        this.waitForElementPresent(getSavedArticleXpathByTitle(articleTitle),
                 "Cannot find saved article by title " + articleTitle, 15);
     }
 
     public void waitForArticleToDisappearByTitle(String articleTitle) {
-
-        this.waitForElementNotPresent(getFolderXpathByName(articleTitle),
+        this.waitForElementNotPresent(getSavedArticleXpathByTitle(articleTitle),
                 "Saved article still present with title " + articleTitle, 15);
     }
 
     public void swipeByArticleToDelete(String articleTitle) {
         this.waitForArticleToAppearByTitle(articleTitle);
-        this.swipeElementToLeft(getSavedArticleXpathByTitle(articleTitle),
+        String articleXPath = getSavedArticleXpathByTitle(articleTitle);
+        this.swipeElementToLeft(articleXPath,
                 "Cannot find saved article " + articleTitle);
+        if (Platform.getInstance().isIOS()) {
+            this.clickElementToTheRightUpperCorner(articleXPath, "Cannot find saved article");
+        }
         this.waitForArticleToDisappearByTitle(articleTitle);
     }
 
     public void openSavedArticleByTitle(String articleTitle) {
-        this.waitForElementAndClick(getFolderXpathByName(articleTitle),
+        this.waitForElementAndClick(getSavedArticleXpathByTitle(articleTitle),
                 "Cannot find saved article by title " + articleTitle, 15);
+    }
+
+    public void openSavedArticleByDescription(String articleDescription) {
+        this.waitForElementAndClick(getSavedArticleXpathByDescription(articleDescription),
+                "Cannot find saved article by description " + articleDescription, 15);
     }
 }
